@@ -1,12 +1,14 @@
 import numpy as np
 import cPickle
+import infotheory as IT
+
 #import matplotlib.pyplot as plt
 
 class Grid():
-    def __init__(self,nframes,gx,gy,dgx,dgy,center,resizing,dt,forwards):
+    def __init__(self,nframes,worldsize,gx,gy,dgx,dgy,center,resizing,dt,forwards):
         self.grid = []
         self.nframes = nframes
-        self.frames = np.arange(0,nframes,1)
+        self.worldsize = worldsize
         self.gx = gx
         self.gy = gy
         self.dgx = dgx
@@ -15,6 +17,7 @@ class Grid():
         self.resize = resizing
         self.dt = dt
         self.forwards = forwards
+        
         for frame in range(nframes):
             frame1 = []
             for ix in range(gx):
@@ -28,6 +31,7 @@ class Grid():
         if len(i) == 3 and type(i[0]) == int:
             frame,ix,iy = i
             return self.grid[frame][ix*self.gx+iy]
+        
         if len(i) == 3 and type(i[0]) == str:
             attribute,ix,iy = i
             entropy_t_list = []
@@ -50,7 +54,7 @@ class Grid():
         return entropy_t_list
      
     def timestep(self,t,cellstate,lineage):
-        print '-'*16,'Step ',t,'-'*16
+        #print '-'*16,'Step ',t,'-'*16
         #Add cells to gridcells :
         self.add_cells_to_ensembles(t,cellstate,lineage)
         #calc velocity of grid at t = 0 to t+1: 
@@ -62,7 +66,7 @@ class Grid():
         if self.forwards == False:
             if Total > counted_total:
                 print 'Cells in the void between ensembles: ', Total - counted_total
-        print 'Done'
+        #print 'Done'
         
     def add_cells_to_ensembles(self,t,cellstate,lineage):
         for ix in range(self.gx):
@@ -88,7 +92,26 @@ class Grid():
                 self[t+1,ix,iy].py = self[t,ix,iy].py + self[t,ix,iy].vy*self.dt
         return Total, counted_total
     
+
     
+
+    def entropycalc(self,attribute,x,y,nbins,skip):
+        for t in range(self.nframes):
+            if self[t,x,y].cell_number != 0:
+                histogram,attr_edges,attrib_list = self[t,x,y].histogram_ensemble(attribute,nbins,skip)
+                self[t,x,y].entropy[attribute] = IT.entropy(histogram)
+
+    def add_entropy(self,attribute,nbins,skip):
+        #attribute = attribute_analysis()
+        for it in range(self.nframes):
+            for ix in range(self.gx):
+                for iy in range(self.gy):
+                    if len(self[it,ix,iy].cells) != 0:
+                        self[it,ix,iy].calculate_average(attribute)
+        for ix in range(self.gx):
+            for iy in range(self.gy):
+                    self.entropycalc(attribute,ix,iy,nbins,skip)
+
 class Ensemble():
     def __init__(self,frame,ix,iy,px0,py0):
         self.px = px0
@@ -152,6 +175,7 @@ class Ensemble():
         self.vx = resize*dx/dt
         self.vy = -resize*dy/dt
         return total_cells,self.cell_number
+    
     def CheckCellInEnsemble(self,cellstate,resize,dgx,dgy,center):
         x,y = pos2pixel(cellstate.pos[0],resize)+center,-pos2pixel(cellstate.pos[1],resize)+center
         xg,yg = self.px, self.py
@@ -159,6 +183,23 @@ class Ensemble():
             return True
         else:
             return False
+        
+    def histogram_ensemble(self,attribute,nbins,skip):
+        attrib_list = [getattr(self.cells[id],attribute,np.nan) for id in self.cells.keys()]
+        attrib_arr = np.array(attrib_list) 
+        attrib_arr = attrib_arr[~np.isnan(attrib_arr)]
+        hist,attr_edge = np.histogram(attrib_arr[attrib_arr>=skip],bins = nbins)
+        return hist,attr_edge,attrib_list
+    
+    def calculate_average(self,attribute):
+        avg = 0
+        n = 0
+        for id in self.cells.keys():
+            cell_atr = getattr(self.cells[id],attribute, None)
+            if cell_atr:
+                avg += cell_atr
+                n += 1
+        self.averages[attribute] = avg/len(self.cells)
 '''
 def fname2pickle(fname):
     if fname.endswith(".png") or fname.endswith(".jpg"):
@@ -181,7 +222,7 @@ def loadPickle(fname,startframe,nframes,dt, forwards):
     lineage = np.array([element['lineage'] for    element in data])
     return cellstate,lineage
 
-def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True, GridMethod = None):
+def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True, bins = 256, skip = 0):
     
     cellstate, lineage = loadPickle(fname,startframe,nframes,dt,forwards)
 
@@ -190,22 +231,22 @@ def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True,
     gx,gy = int(np.floor(worldsize/gridfac)),int(np.floor(worldsize/gridfac)) #grid dimensions
     dgx,dgy = gridfac,gridfac
     
-    print "worldsize = ", worldsize
-    print "resizing factor = ", resizing  
-    print "Grid dimensions: ",gx,gy
+    #print "worldsize = ", worldsize
+    #print "resizing factor = ", resizing  
+    #print "Grid dimensions: ",gx,gy
     
-    grid = Grid(nframes,gx,gy,dgx,dgy,C,resizing,dt,forwards)
+    grid = Grid(nframes,worldsize,gx,gy,dgx,dgy,C,resizing,dt,forwards)
     
     for it in range(1,nframes-1):
         grid.timestep(it,cellstate,lineage)
-        
+    
+    x,y,t = grid.gx/2,grid.gy/2,grid.nframes/2
+    idd = grid[t,x,y].cells.keys()[2]
+
+    grid.add_entropy('vx',256,0)
+
+    for item in vars(grid[t,x,y].cells[idd]):
+        if type(getattr(grid[t,x,y].cells[idd],item)) == int or type(getattr(grid[t,x,y].cells[idd],item)) == float:
+            grid.add_entropy(item,bins,skip)
+    
     return grid,cellstate
-
-
-
-afname = "/Users/Medina/cellmodeller/data/Practice_Script_Log2-18-08-08-16-11/step-%05d.pickle"
-astartframe = 0
-anframes = 180
-adt = 1 #There's a bit of trouble with this
-agridfactor = 16 #pixels per grid
-grid,cs = main(afname,astartframe,anframes,adt,agridfactor,forwards = False, GridMethod = 1)
