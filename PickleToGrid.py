@@ -158,7 +158,7 @@ class Ensemble():
                     if forwards == False:
                         #print '----- Cell not in current step, checking for division'
                         # Previous cell does not exist, use parent cell
-                        #print lineage
+                       # print lineage
                         pids = [key for key, value in lineage.iteritems() if value == id]
                         pid = pids[0]
                         #print 'Using daughter cell: ',pid
@@ -211,7 +211,7 @@ def fname2pickle(fname):
 def pos2pixel(ps,factr):
     return factr*ps
 
-def loadPickle(fname,startframe,nframes,dt, forwards):
+def loadPickle_pro(fname,startframe,nframes,dt, forwards):
      
     if forwards == True:
         data = np.array([cPickle.load(open(fname%(startframe+(i*dt)))) for i in range(nframes)]) #forward
@@ -219,12 +219,17 @@ def loadPickle(fname,startframe,nframes,dt, forwards):
         data = np.array([cPickle.load(open(fname%(startframe+(nframes-i)*dt))) for i in range(nframes)]) #backwards     
 
     cellstate = np.array([element['cellStates'] for element in data])
-    lineage = np.array([element['lineage'] for    element in data])
+    lineage = np.array([element['lineage'] for element in data])
     return cellstate,lineage
 
-def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True, bins = 256, skip = 0):
+def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True, bins = 256, skip = 0,App = None):
     
-    cellstate, lineage = loadPickle(fname,startframe,nframes,dt,forwards)
+    if App:
+        cellstate = App[0]
+        lineage = App[1]
+        
+    else:
+        cellstate, lineage = loadPickle_pro(fname,startframe,nframes,dt,forwards)
 
     resizing = 1
     C = worldsize/2 
@@ -243,7 +248,7 @@ def main(fname,startframe,nframes,dt,gridfac,worldsize = 250.0, forwards = True,
     x,y,t = grid.gx/2,grid.gy/2,grid.nframes/2
     idd = grid[t,x,y].cells.keys()[2]
 
-    grid.add_entropy('vx',256,0)
+    #grid.add_entropy('vx',256,0)
 
     for item in vars(grid[t,x,y].cells[idd]):
         if type(getattr(grid[t,x,y].cells[idd],item)) == int or type(getattr(grid[t,x,y].cells[idd],item)) == float:
