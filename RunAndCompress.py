@@ -4,7 +4,7 @@ import PickleToGrid as PTG
 import cPickle
 import AddProteins as App
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 def GetSubDir(foldername):
     directory = os.listdir(foldername)
@@ -32,14 +32,14 @@ def obtain_entropy(grid,desired):
     return desired_array
             
     
-def Compress_grid(grid,desired):
+def Compress_grid_entropy(grid,desired):
     comp_info = np.array([grid.nframes,grid.gx,grid.gy,grid.dgx,grid.dgy,grid.center,grid.resize,grid.dt,grid.forwards])
     packed_entropy = obtain_entropy(grid,desired)
     return comp_info,packed_entropy
             
 
 
-def Calculate_expected_squared(grid):
+def Calculate_expected(grid):
     
     for it in range(1,grid.nframes-1):
         for ix in range(grid.gx):
@@ -47,50 +47,96 @@ def Calculate_expected_squared(grid):
                 Ensemble = grid[it,ix,iy]
                 if Ensemble.cell_number > 0.0:  
                     #Calculate the expected value over an Ensemble:
-                    for id,cell in Ensemble.cells.iteritems():
-                        
-                        cell.log_red_squared =  cell.log_red_protein
-                        cell.log_green_squared = cell.log_green_protein
-                        cell.log_blue_squared = cell.log_blue_protein
-                        
                     #make list of red green etc proteins in an ensemble
                     
-                    logsq_red_prot_array = np.sort(np.array([Ensemble.cells[id].log_red_squared for (id,cell) in Ensemble.cells.iteritems()]))
-                    logsq_green_prot_array = np.sort(np.array([Ensemble.cells[id].log_green_squared for (id,cell) in Ensemble.cells.iteritems()]))
-                    logsq_blue_prot_array = np.sort(np.array([Ensemble.cells[id].log_blue_squared for (id,cell) in Ensemble.cells.iteritems()]))
+                    #logsq_red_prot_array = np.array([Ensemble.cells[id].log_red_squared for (id,cell) in Ensemble.cells.iteritems()])
+                    #logsq_green_prot_array = np.array([Ensemble.cells[id].log_green_squared for (id,cell) in Ensemble.cells.iteritems()])
+                    #logsq_blue_prot_array = np.array([Ensemble.cells[id].log_blue_squared for (id,cell) in Ensemble.cells.iteritems()])
                     
-                    Ensemble.expect_logsq_red = np.var(logsq_red_prot_array)
-                    Ensemble.expect_logsq_green = np.var(logsq_green_prot_array)
-                    Ensemble.expect_logsq_blue = np.var(logsq_blue_prot_array)
+                    #poissq_red = np.array([Ensemble.cells[id].poisson_red_squared for (id,cell) in Ensemble.cells.iteritems()])
+                    
+                    Rp_ensemble_array = np.array([cell.red_protein for (id,cell) in Ensemble.cells.iteritems()])
+                    vol_ensemble_array = np.array([cell.volume for (id,cell) in Ensemble.cells.iteritems()])
+                    concentration_ensemble_array = Rp_ensemble_array/vol_ensemble_array
+                    
+                    #Ensemble.expect_logsq_red = np.var(logsq_red_prot_array)
+                    #Ensemble.expect_logsq_green = np.var(logsq_green_prot_array)
+                    #Ensemble.expect_logsq_blue = np.var(logsq_blue_prot_array)
+                    #Ensemble.exp_poissq_red = np.var(poissq_red)
+                    
+                    Ensemble.expected_concentration = np.var(concentration_ensemble_array) 
+                    Ensemble.total_Rp = np.sum(Rp_ensemble_array)
+                    
                 else:
-                    Ensemble.expect_logsq_red = 0.0
-                    Ensemble.expect_logsq_green = 0.0
-                    Ensemble.expect_logsq_blue = 0.0
+                    Ensemble.expected_concentration = 0.0
+                    Ensemble.total_Rp = 0.0
+                    #Ensemble.expect_logsq_red = 0.0
+                    #Ensemble.expect_logsq_green = 0.0
+                    #Ensemble.expect_logsq_blue = 0.0
+                    #Ensemble.exp_poissq_red = 0.0
+                    
     return grid
                     
 
 def plot_ensemble_all_t(grid,ix,iy):
-    listplot = []
-    for it in range(nframes):
-        listplot = listplot.append(grid[it,ix,iy].expect_logsq_red)
-    plt.plot(listplot)
+    max_dist = 0   
+     
+    array2plot = np.array([grid[it,ix,iy].expected_concentration for it in range(1,grid.nframes-1)])
+        
+    dist_from_center = np.sqrt(((ix-7.0)**2)+((iy-7.0)**2))
+    if dist_from_center > max_dist:
+        max_dist = dist_from_center
+    color_RGB = [dist_from_center/max_dist,0,0]
+    plt.plot(array2plot[::-1],color = color_RGB)
     
 def plot_grid(grid):
     for ix in range(grid.gx):
         for iy in range(grid.gy):
             plot_ensemble_all_t(grid,ix,iy)
     
+def variance_concentration(cellstates):
+    listplot = []
 
+    for t in range(len(cellstates)):
+        red_protein_array = np.array([cell.red_protein for (id,cell) in cellstates[t].iteritems()])
+        volume_array = np.array([cell.volume for (id,cell) in cellstates[t].iteritems()])
+        var_t = np.var(red_protein_array/volume_array)
+        print red_protein_array/volume_array
+        print var_t
+        listplot.append(var_t)
+    plt.plot(listplot[::-1],"b")
     
+    
+'''
+def protein_counter(cellstates):
+    protein_total_list = []
+    for it in range(len(cellstates)):
+        red_prot_list =[cell.red_protein for id,cell in cellstates[it].iteritems()]
+        print len(cellstates[it]), red_prot_list
+        print np.var(red_prot_list)
+        protein_total_list.append(np.sum(red_prot_list))
+    return protein_total_list[::-1]
+
+def protein_counter_ensemble(grid,ix,iy):
+    protein_total_list = []
+    for it in range(1,grid.nframes-1):
+        
+        protein_total_list.append(grid[it,ix,iy].total_Rp)
+        
+        
+    plt.plot(protein_total_list[::-1])
+'''        
     
 datafolders = []
 rootdir = "/Users/Medina/cellmodeller/data"
 startframe = 0
-nframes = 130
+nframes = 550
 dt = 1 #There's a bit of trouble with this
 gridsize = 16
 forwards = False
 add_proteins = True
+#sigma = 0
+lambd = 3.0
 '''
 foldername = sys.argv[1]
 startframe = sys.argv[2]
@@ -108,27 +154,25 @@ for simulation in datafiles:
     print 'Loading and running '+ datafolders[i]
 
     if add_proteins == True:
-        cellstates,lineage = App.add_protein_pickles(simulation,startframe,nframes,PTG = forwards)
+        cellstates,lineage = App.add_protein_pickles(simulation,startframe,nframes,PTG = forwards,lambd = lambd)
   
     grid,cs = PTG.main(simulation,startframe,nframes,dt,gridsize,forwards = forwards, App = [cellstates,lineage])
     
-    
-    
-    grid = Calculate_expected_squared(grid)
+    grid = Calculate_expected(grid)
 
-    total_var_red = np.array([np.var(np.array([cs[t][id].log_red_protein for (id,cell) in cs[t].iteritems() ])) for t in range(grid.nframes)])
+    total_var_red = np.array([np.var(np.array([cs[t][id].red_protein for (id,cell) in cs[t].iteritems() ])) for t in range(grid.nframes)])
 
     print 'Finished, Compressing and writing'
-    comp_info,packed_entropy = Compress_grid(grid,desired)
+    #comp_info,packed_entropy,packed_variance = Compress_grid(grid,desired)
     
     
-    path_to_write = rootdir+'/packed_entropy_data/'
-    if not os.path.isdir(path_to_write):
-        os.makedirs(path_to_write)
-    cPickle.dump( packed_entropy, open(path_to_write+folders[i]+".pickle", "wb" ) )
-    i += 1
+    #path_to_write = rootdir+'/packed_entropy_data/'
+    #if not os.path.isdir(path_to_write):
+    #    os.makedirs(path_to_write)
+    #cPickle.dump( packed_entropy, open(path_to_write+folders[i]+".pickle", "wb" ) )
+    #i += 1
     
-    print 'Done'
+    #print 'Done'
 
 
         
