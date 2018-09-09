@@ -161,7 +161,7 @@ def protein_counter_ensemble(grid,ix,iy):
         
         
     plt.plot(protein_total_list[::-1])  
-    
+'''  
 datafolders = []
 rootdir = "/Users/Medina/cellmodeller/data"
 startframe = 0
@@ -172,14 +172,15 @@ forwards = False
 add_proteins = True
 #sigma = 0
 lambd = 3.0
-'''
+
+
 foldername = sys.argv[1]
 startframe = sys.argv[2]
 nframes = sys.argv[3]
 dt = sys.argv[4] #There's a bit of trouble with this
 gridsize = sys.argv[5]
 forwards = sys.argv[6]
-'''         
+       
 
 datafolders,datafiles,folders = GetSubDir(rootdir)
 datapack = []
@@ -191,7 +192,7 @@ def start(i):
 
         if add_proteins == True:
             cellstates,lineage = App.add_protein_pickles(simulation,startframe,nframes,PTG = forwards,lambd = lambd)
-    
+
     
     
     #----------PRE DURING
@@ -213,6 +214,6 @@ def start(i):
     
     #print 'Done'
 
-
+'''
         
         

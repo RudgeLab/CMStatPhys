@@ -33,6 +33,6 @@ for simulation in datafiles:
     for repet in range(1,repetitions+1):
         n_norm, r_bins = PR.obtain_convergent_curves(cellstate,t1,t2,nbins)
     
-        np.savetxt(path_to_write+'/'+folders[i]+'r'+str(repet)+'.gz',n_norm)
+        np.savetxt(path_to_write+'/'+folders[i]+'-r-'+str(repet)+'.gz',n_norm)
     i+=1
     
