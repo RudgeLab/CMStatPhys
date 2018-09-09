@@ -19,7 +19,6 @@ def add_proteins(cellstate,lineage,sigma = 0, lambd = 0): #cellstate[t],cellstat
     
     #------------- dividing module
     for t in range(len(cellstate)-1):
-        print "---------------------Step ",t
         for id,parent in cellstate[t].iteritems():
             if t == 0:
                 
@@ -73,7 +72,6 @@ def add_proteins(cellstate,lineage,sigma = 0, lambd = 0): #cellstate[t],cellstat
                 #cellstate[t][id],cellstate[t+1][did1],cellstate[t+1][did2] = DD.divide_RGB_Poisson(parent,cellstate[t+1][did1],cellstate[t+1][did2],lambd)
                 #------Binomial division
                 cellstate[t][id],cellstate[t+1][did1],cellstate[t+1][did2] = DD.divide_binomial(parent,cellstate[t+1][did1],cellstate[t+1][did2])
-            print id, parent.red_protein
             #print '+++++++++++next cell'
     return cellstate
 
@@ -89,14 +87,23 @@ def add_protein_pickles(fname,startframe,nframes,forwards = True, PTG = None,sig
         auxdic['cellStates'] = cellstate[t]
         auxdic['lineage'] = lineage[t]
         simplepickle.append(auxdic)
+        
     if PTG == True:
         return cellstate,lineage
+    
     if PTG == False:
         return cellstate[::-1],lineage[::-1]
+    
     else:
         return simplepickle
     
-    
+def add_radius(cellstate):
+    for it in range(len(cellstate)):
+        for id,cell in cellstate[it].iteritems():
+            x_cell,y_cell,z_cell = cell.pos[0],cell.pos[1],cell.pos[2]
+            cellstate[it][id].r_dist =  np.sqrt((x_cell**2)+(y_cell**2)+(z_cell**2))
+    return cellstate
+            
     
 '''   
 datafolders = []

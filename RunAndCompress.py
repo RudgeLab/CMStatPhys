@@ -5,6 +5,7 @@ import cPickle
 import AddProteins as App
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def GetSubDir(foldername):
     directory = os.listdir(foldername)
@@ -87,11 +88,11 @@ def plot_ensemble_all_t(grid,ix,iy):
     if dist_from_center > max_dist:
         max_dist = dist_from_center
     color_RGB = [dist_from_center/max_dist,0,0]
-    plt.plot(array2plot[::-1],color = color_RGB)
+    plt.plot(array2plot[::-1],color = color_RGB,linewidth = 0.2)
     
 def plot_grid(grid):
-    for ix in range(grid.gx):
-        for iy in range(grid.gy):
+    for ix in range(4,grid.gx-3):
+        for iy in range(4,grid.gy-3):
             plot_ensemble_all_t(grid,ix,iy)
     
 def variance_concentration(cellstates):
@@ -104,10 +105,45 @@ def variance_concentration(cellstates):
         print red_protein_array/volume_array
         print var_t
         listplot.append(var_t)
-    plt.plot(listplot[::-1],"b")
+        #D = np.array([var[t]**2/(4*t) for t in range(len(var)) ])
+    return listplot[::-1]
+
     
     
-'''
+def conc_plot(grid):
+    ixs = np.array([ix for ix in range(grid.gx)])
+    iys = np.array([iy for iy in range(grid.gy)])
+    R = np.sqrt(ixs**2+iys**2)
+    T = np.array([it for it in range(1,grid.nframes-2)])
+    R,T = np.meshgrid(R,T)
+    XY = np.zeros(R.shape)
+    for rad in range(len(R[0])):
+        ix = rad
+        iy = rad
+        
+        for it in range(1,len(T[:,0])):
+            
+            XY[it,rad] = grid[int(it),int(ix),int(iy)].expected_concentration   
+    ax = Axes3D(plt.gcf())             
+    ax.plot_wireframe(R,T,XY)
+    
+def Rp_plot(grid):
+    ixs = np.array([ix for ix in range(grid.gx)])
+    iys = np.array([iy for iy in range(grid.gy)])
+    R = np.sqrt(ixs**2+iys**2)
+    T = np.array([it for it in range(1,grid.nframes-2)])
+    R,T = np.meshgrid(R,T)
+    XY = np.zeros(R.shape)
+    for rad in range(len(R[0])):
+        ix = rad
+        iy = rad
+        
+        for it in range(1,len(T[:,0])):
+            
+            XY[it,rad] = grid[int(it),int(ix),int(iy)].total_Rp  
+    ax = Axes3D(plt.gcf())             
+    ax.plot_wireframe(R,T,XY)
+
 def protein_counter(cellstates):
     protein_total_list = []
     for it in range(len(cellstates)):
@@ -124,8 +160,7 @@ def protein_counter_ensemble(grid,ix,iy):
         protein_total_list.append(grid[it,ix,iy].total_Rp)
         
         
-    plt.plot(protein_total_list[::-1])
-'''        
+    plt.plot(protein_total_list[::-1])  
     
 datafolders = []
 rootdir = "/Users/Medina/cellmodeller/data"
@@ -150,19 +185,23 @@ datafolders,datafiles,folders = GetSubDir(rootdir)
 datapack = []
 desired = ['log_red_protein','log_green_protein','log_blue_protein']
 i = 0
-for simulation in datafiles:
-    print 'Loading and running '+ datafolders[i]
+def start(i):
+    for simulation in datafiles:
+        print 'Loading and running '+ datafolders[i]
 
-    if add_proteins == True:
-        cellstates,lineage = App.add_protein_pickles(simulation,startframe,nframes,PTG = forwards,lambd = lambd)
-  
-    grid,cs = PTG.main(simulation,startframe,nframes,dt,gridsize,forwards = forwards, App = [cellstates,lineage])
+        if add_proteins == True:
+            cellstates,lineage = App.add_protein_pickles(simulation,startframe,nframes,PTG = forwards,lambd = lambd)
     
-    grid = Calculate_expected(grid)
+    
+    
+    #----------PRE DURING
+    #grid,cs = PTG.main(simulation,startframe,nframes,dt,gridsize,forwards = forwards, App = [cellstates,lineage])
+    
+    #grid = Calculate_expected(grid)
+    
+    #total_var_red = np.array([np.var(np.array([cs[t][id].red_protein for (id,cell) in cs[t].iteritems() ])) for t in range(grid.nframes)])
 
-    total_var_red = np.array([np.var(np.array([cs[t][id].red_protein for (id,cell) in cs[t].iteritems() ])) for t in range(grid.nframes)])
-
-    print 'Finished, Compressing and writing'
+    #print 'Finished, Compressing and writing'
     #comp_info,packed_entropy,packed_variance = Compress_grid(grid,desired)
     
     
