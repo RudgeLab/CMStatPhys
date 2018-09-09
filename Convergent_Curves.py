@@ -31,8 +31,8 @@ for simulation in datafiles:
     cellstate = App.add_radius(cellstates_reordered) #get r for each cell
     
     for repet in range(1,repetitions+1):
-        n_norm, r_bins = PR.obtain_convergent_curves(cellstate,10,690,nbins)
+        n_norm, r_bins = PR.obtain_convergent_curves(cellstate,t1,t2,nbins)
     
-        np.savetxt(path_to_write+'/'+folders[i]+repet+'.gz',n_norm)
-        i+=1
+        np.savetxt(path_to_write+'/'+folders[i]+'r'+str(repet)+'.gz',n_norm)
+    i+=1
     
