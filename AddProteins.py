@@ -104,34 +104,3 @@ def add_radius(cellstate):
             cellstate[it][id].r_dist =  np.sqrt((x_cell**2)+(y_cell**2)+(z_cell**2))
     return cellstate
             
-    
-'''   
-datafolders = []
-rootdir = "/Users/Medina/cellmodeller/data"
-startframe = 0
-nframes = 180
-dt = 1 #There's a bit of trouble with this
-gridsize = 16
-forwards = False
-full_folders,data_names_files,folders = GetSubDir(rootdir)
-
-i = 0
-for simulation in datafiles:
-    newpickle = add_proteins(simulation,startframe,nframes,forwards = forwards)
-    
-    path_to_write = rootdir+'/rewritten_pickles/'
-    
-    
-    if not os.path.isdir(path_to_write):
-        os.makedirs(path_to_write)
-    
-    for t in range(len(newpickle)):
-        #for now, after don't use writing
-        new_path_to_write = path_to_write+folders[i]
-        if not os.path.isdir(new_path_to_write):
-            os.makedirs(new_path_to_write)
-        print "Writing: "+new_path_to_write+"/step-%05d"%t+".pickle"
-        cPickle.dump( newpickle[t], open(new_path_to_write+"/step-%05d"%t+".pickle", "wb" ) )
-    i+=1
-    '''
-    

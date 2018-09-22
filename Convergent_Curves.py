@@ -1,5 +1,4 @@
 import PlayRoom as PR
-import LoadModifiedCellstates as LMC
 import AddProteins as App
 from RunAndCompress import GetSubDir
 import os
@@ -25,6 +24,7 @@ if not os.path.isdir(path_to_write):
     os.makedirs(path_to_write)
 for simulation in datafiles:
     for repet in range(1,repetitions+1):
+        print "Repetition: ", repet
         print 'Loading and running '+ datafolders[i]
         cellstates = App.add_protein_pickles(simulation,startframe,nframes,lambd = lambd)
         cellstates_reordered = [cellstates[t]['cellStates'] for t in range(nframes)]
