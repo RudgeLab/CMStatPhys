@@ -57,12 +57,47 @@ def find_zero(cellstate):
         z_0 += cell.pos[2]
     return x_0/len(cellstate),y_0/len(cellstate),z_0/len(cellstate)
 
-def add_radius(cellstate):
+def add_radius_angle_area(cellstate):
+    
     x_0,y_0,z_0 = find_zero(cellstate)
+    
     for id,cell in cellstate.iteritems():
+        
         x_cell,y_cell,z_cell = cell.pos[0],cell.pos[1],cell.pos[2]
-        cellstate[id].r_dist =  np.sqrt(((x_cell-x_0)**2)+((y_cell-y_0)**2)+((z_cell-z_0)**2))
+        cell.r_dist =  np.sqrt(((x_cell-x_0)**2)+((y_cell-y_0)**2)+((z_cell-z_0)**2))
+        #angle
+        angle_r = np.sqrt(x_cell**2 + y_cell**2 + z_cell**2)
+        
+        if y_cell-y_0 >= 0.0 and cell.r_dist != 0.0:
+
+            cell.phi = np.arccos((x_cell-x_0)/cell.r_dist)
+        elif y_cell-y_0 < 0.0 and cell.r_dist != 0.0:
+            cell.phi = 2*np.pi - np.arccos((x_cell-x_0)/cell.r_dist)
+        else:
+            cell.phi = 0.0
+        #area    
+        r = cell.radius
+        l = cell.length
+        cell.area = np.pi*r**2 + 2*r*l
+        
     return cellstate
+
+def add_ndiv(cellstate_1,cellstate_2):
+    try:
+        cellstate_1[1].ndiv = 1
+        cellstate_2[1].ndiv = 1
+    except:
+        a = 0
+        
+    for id,cell in cellstate_2.iteritems():
+        try: #if doesn't divide register the new amount of cells in the current cellstate
+            cellstate_1[id] 
+            cell.ndiv = cellstate_1[id].ndiv
+            #must be number of cells when the cell first appears
+        except KeyError: #if it divides register the amount of cells at time of division
+            cell.ndiv = len(cellstate_2)
+        
+    return cellstate_1,cellstate_2
 
 def bin_check(cell_dist,r_bins,j):
     if cell_dist >= r_bins[j] and cell_dist < r_bins[j+1]:
@@ -81,6 +116,14 @@ def get_R_max_t(cells_t):     #get max R
         if cell.r_dist > R_max_t:
             R_max_t = cell.r_dist
     return R_max_t   
+
+def get_max_area(cells_t):     #get max R
+
+    max_area = 0.0
+    for id,cell in cells_t.iteritems():
+        if cell.area > max_area:
+            max_area = cell.area
+    return max_area   
 
 def obtain_convergent_curves(cellstate,nbins=20):
     
@@ -129,6 +172,44 @@ def obtain_convergent_curves(cellstate,nbins=20):
         
     return n_i,n_prot,r_bins
 
+def obtain_convergent_curves_branch(branch,R_max_t,nbins=20):
+    
+    cells_t = branch
+                        
+    max_area = get_max_area(cells_t)
+            
+    r_bins = np.linspace(0,1,nbins)
+    
+    n_i= np.array([])
+    
+    for j in range(0,len(r_bins)-1):
+        
+        bin_value = 0
+        area_bin = 0.0
+        
+        for id,cell in cells_t.iteritems():
+            
+            if R_max_t != 0.0:
+                cell_dist = cell.r_dist/R_max_t
+            else:
+                cell_dist = 1.0
+            
+            if bin_check(cell_dist,r_bins,j) == True: 
+                
+                bin_value += cell.red_protein
+                area_bin += cell.area/max_area
+                
+            else:
+                
+                bin_value += 0.0
+                
+        if area_bin != 0:
+            bin_value = bin_value/area_bin
+        
+        n_i = np.append(n_i,bin_value)
+        
+    return n_i,r_bins
+'''
 datafolders = []
 root = "/Users/Medina/cellmodeller"
 rootdir = root+"/data"
@@ -140,7 +221,7 @@ i = 0
 
 nframes = 700
 lambd = 1.0
-nbins = 20
+nbins = 25
 repetitions = 3
 path_to_write = root+"/convergent_curves"
 if not os.path.isdir(path_to_write):
@@ -153,15 +234,14 @@ for simulation in datafiles:
         print "Repetition: ", repet
         print 'Loading and running '+ datafolders[i]
         n_norm = []
-        for t in range(nframes-1):
-            print '------',t
+        for t in range(nframes-2):
             if t == 0:
                 cellstate_1,lineage_1,cellstate_2,lineage_2 = load2pickles(simulation,t)
             else: 
                 cellstate_2,lineage_2 = loadPickle_lite(simulation,t+1)
                 
             cellstate_1,cellstate_2 = add_proteins_2(cellstate_1,cellstate_2,lineage_2,t,lambd=lambd)
-            cellstate_1 = add_radius(cellstate_1) #get r for each cell
+            cellstate_1 = add_radius_angle_area(cellstate_1) #get r for each cell
             
             n_i,n_prot, r_bins = obtain_convergent_curves(cellstate_1,nbins)
             n_n = (n_i-n_prot)
@@ -172,4 +252,4 @@ for simulation in datafiles:
         n_norm = np.array(n_norm)
         np.savetxt(path_to_write+'/'+folders[i]+'-r-'+str(repet)+'.gz',n_norm)
     i+=1
-    
+'''
