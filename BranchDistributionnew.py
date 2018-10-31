@@ -56,7 +56,7 @@ def bin_radius(variances,R_max_t,bid_array,Tree,nbins):
         
     return r_bins,alpha_i
 
-def run_script(fname,t1,t2,Tree,nbins):
+def run_script(fname,t1,t2,tm,Tree,nbins):
     
     
     cellstate_0,lin_0 = NWK.loadPickle_lite(fname,t1)
