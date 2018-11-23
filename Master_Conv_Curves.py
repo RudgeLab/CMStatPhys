@@ -28,14 +28,14 @@ nbins = 25
 t1 = 400
 t2 =  690
 
-
+'''
 master_conv = np.array([load_arrays(rootdir+'/'+path) for path in filelist])
 #shape : (nfiles,delta times,nbins-1)
 flattened = np.average(master_conv,axis = 0)
 t,r = flattened.shape
 r,t = np.arange(r),np.arange(t)
 r,t = np.meshgrid(r,t)
-
+'''
 '''
 ax = Axes3D(plt.gcf())
 ax.set_xlabel('r')
@@ -47,8 +47,7 @@ ax.plot_wireframe(r,t,flattened)
 r = flattened.shape[1]
 r = np.linspace(0,1,r)
 work = flattened[1498]
-ababacab = (1-lambd*(r))
-plt.plot(ababacab,'k')
-plt.plot(work,'r')
+plt.plot(r,ababacab,'k')
+plt.plot(r,work,'r')
 
 

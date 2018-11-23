@@ -11,7 +11,6 @@ def load_data(nframes,lambd):
     cellstate = LMC.not_another_main(nframes,lambd)
     print "Loaded, adding radius"
 
-    cellstate = App.add_radius(cellstate) #get r for each cell
     print "radius ready"
     #cellstate = LMC.load_unmod(1500)
     return cellstate
@@ -146,6 +145,8 @@ def obtain_n_t(cellstate,t1,t2):
 #--------------------------------------------------------------------
 def add_grow_rate_i(cellstate,t):
     for id,cell in cellstate[t].iteritems():
+        if t == 0:
+            cell.mu = 0
         try:
             cellstate[t+1][id]
             r1 = cell.radius
@@ -160,7 +161,7 @@ def add_grow_rate_i(cellstate,t):
         except:
             mu_i = cellstate[t-1][id].mu
             cell.mu = mu_i
-    return cellstate
+    return cellstate[t]
 
 
 
@@ -242,16 +243,26 @@ def get_mu_r_t(cellstate,tbins = 897,nbins=50):
 
 def theoretical_N_t(cellstate,t1,t2):
     for t in range(t1,t2):
-        cellstate = add_grow_rate_i(cellstate,t)
+        cellstate[t] = add_grow_rate_i(cellstate,t)
     v_t,a_v,N_t,R_max_t,R_t = idea2(cellstate,t1,t2)
     R_t,Vv = fix_Radii(v_t,a_v,R_max_t,N_t)
     mu_t = get_mu_t(cellstate,t1,t2)
     int_mu = np.array([sum(mu_t[0:t]) for t in range(t1,t2)])
-    N_tt = np.exp(int_mu)
-    return N_tt
+    N_tt = 1*np.exp(int_mu)
+    R_tt = np.sqrt(v_t[0]/np.pi)*np.exp(0.5*int_mu)
+    A_tt = v_t[0]*np.exp(int_mu)
+    return N_tt,R_tt,A_tt,N_t,R_t,v_t,int_mu,Vv
 
+cellstates = load_data(900,1)
+N_tt,R_tt,A_tt,N_t,R_t,v_t,int_mu,Vv = theoretical_N_t(cellstates,0,899)
+'''        
+fig, ax = plt.subplots()
+ax.plot(a, c, 'k--', label='Model length')
+ax.plot(a, d, 'k:', label='Data length')
+ax.plot(a, c + d, 'k', label='Total message length')
 
-        
+legend = ax.legend(loc='upper center', shadow=True, fontsize='x-large')
+'''
 #--------------------------------------------------------------------
 
 #--------------------------------------------------------------------

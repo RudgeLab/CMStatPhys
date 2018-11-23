@@ -104,7 +104,6 @@ def branch_to_cells(cellstate,branch):
         
         
         
-
 '''
 fname = "/Users/Medina/cellmodeller/data/Practice_Script_Blank-18-08-21-13-44/step-%05d.pickle"
 #Practice_Script_Blank-18-08-21-14-28  Practice_Script_Blank-18-08-21-15-12
@@ -175,27 +174,26 @@ for bid in dic_pos.keys():
 plt.hist(np.log10(hist),bins = 100)
 '''
 #Branch size histogram fix?
-'''
-t = 100
-cellstate_t,lineage_t = loadPickle_lite(fname,t)
-
-ncells_tf = float(len(cellstate_2))
-
 hist = []
-for bid in cellstate_t.iteritems():
-    real = 0.0
-    expected = 1.0/len(cellstate_t)
-    try:
-        branch_cells = [cellstate_2[id] for id in Oak.branch[bid].nodes]
-        real = float(len(branch_cells))
-        realvalue = real/ncells_tf
-        print realvalue, expected
-        Gamma = realvalue/expected
-        hist.append(Gamma)
-    except:
-        a = 0
-plt.hist(np.log10(hist),bins = 100)
-'''
+for t in range(100,1000):
+    cellstate_t,lineage_t = loadPickle_lite(fname,t)
+    
+    ncells_tf = float(len(cellstate_t))
+    
+    for bid,cell in cellstate_t.iteritems():
+        real = 0.0
+        expected = 1.0/len(cellstate_t)
+        try:
+            branch_cells = [cellstate_2[id] for id in Oak.branch[bid].nodes if cellstate_2.has_key(id)]
+            real = float(len(branch_cells))
+            #realvalue = real/len(cellstate_2)
+            #Gamma = realvalue/expected
+            #hist.append(Gamma)
+            hist.append(real)
+        except:
+            a = 0
+#plt.hist(hist,bins = 100,log = True)
+
 #NETWORK PLOTS
 '''
 for id,pid in lineage_2.iteritems():

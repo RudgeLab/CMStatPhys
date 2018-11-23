@@ -27,9 +27,11 @@ def not_another_main(nframes,lambd):
     i = 0
     for simulation in datafiles:
         print 'Loading and running '+ datafolders[i]
-        cellstates = App.add_protein_pickles(simulation,startframe,nframes,lambd = lambd)
-        cellstates_reordered = [cellstates[t]['cellStates'] for t in range(nframes)]
-        return cellstates_reordered
+        cellstates,lineages = App.loadPickle_pro(simulation,startframe,nframes,1,True)
+        cellstates = App.add_radius(cellstates)
+        #cellstates = App.add_protein_pickles(simulation,startframe,nframes,lambd = lambd)
+        #cellstates_reordered = [cellstates[t]['cellStates'] for t in range(nframes)]
+        return cellstates
     
 def load_unmod(nframes):
     

@@ -15,9 +15,9 @@ datafolders,datafiles,folders = GetSubDir(rootdir)
 
 
 
-t1 = 255
-tm = 400
-t2 = 1500
+t1 = 400
+tm = 600
+t2 = 1700
 nbins = 15
 i = 0
 path_to_write = root+"/MSDS"

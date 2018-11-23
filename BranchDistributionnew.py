@@ -103,10 +103,10 @@ def run_script(fname,t1,t2,tm,Tree,nbins):
     alphas = []
     for variance_r in MSDS:
         
-        #color = (np.random.rand(1)[0],np.random.rand(1)[0],np.random.rand(1)[0])
+        color = (np.random.rand(1)[0],np.random.rand(1)[0],np.random.rand(1)[0])
         times = np.arange(t1,t2)
-        #log_time = np.log10(times)
-        #log_var = np.log10(variance_r)
+        log_time = np.log10(times)
+        log_var = np.log10(variance_r)
         
         times_2 = times[times>tm]
         variances_r_2 = variance_r[times>tm]
@@ -114,11 +114,11 @@ def run_script(fname,t1,t2,tm,Tree,nbins):
         if len(variances_r_2)>10:
             polyfit = np.polyfit(np.log10(times_2),np.log10(variances_r_2),1)
             slope = polyfit[0]
-            #c = polyfit[1]
+            c = polyfit[1]
             alphas.append(slope)
-            #plt.plot(np.log10(times_2),slope*np.log10(times_2)+c,color=color,linewidth = 0.5)
+            plt.plot(np.log10(times_2),slope*np.log10(times_2)+c,color=color,linewidth = 0.5)
+        plt.plot(log_time,log_var,color = color,linewidth = 1)
     return r,MSDS,times,alphas
-        #plt.plot(log_time,log_var,color = color,linewidth = 1)
  
 #plt.plot(log_time,log_time,"k")
 #SLOPE OF LOG SPACE  = ALPHA 
