@@ -140,39 +140,20 @@ for t in range(nframes):
         #dic_ndiv[id] = cell.ndiv
 
     cellstate_1 = cellstate_2
-
-print "creating Tree"
-Oak = Create_Tree(lineage_2)
-Oak.create_all_branches()
 '''
+
+
 
         
 '''
 plot_cell_center(cellstate_2)
 '''
-
-#BRANCH SIZE HISTOGRAM
-'''
-ak = float(len(cellstate_2))
-hist = []
-for bid in dic_pos.keys():
-    real = 0.0
-    expected = 1.0/dic_ndiv[bid]
-    try:
-        for id in Oak.branch[bid].nodes:
-            try:
-                cellstate_2[id]
-                real += 1.0
-            except:
-                a = 0
-        realvalue = real/ak
-        print realvalue, expected
-        Gamma = realvalue/expected
-        hist.append(Gamma)
-    except:
-        a = 0
-plt.hist(np.log10(hist),bins = 100)
-'''
+fname = "/Users/Medina/cellmodeller/data/Practice_Script_Blank-18-08-21-13-44/step-%05d.pickle"
+t = 1500
+cellstate_2,lineage_2 = loadPickle_lite(fname,t)
+print "creating Tree"
+Oak = Create_Tree(lineage_2)
+Oak.create_all_branches()
 #Branch size histogram fix?
 hist = []
 for t in range(100,1000):
