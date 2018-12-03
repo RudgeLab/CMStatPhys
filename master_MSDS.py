@@ -15,12 +15,12 @@ def load_arrays(path):
 
 datafolders = []
 root = "/Users/Medina/cellmodeller"
-rootdir = root+"/MSDS/400"
+rootdir = root+"/MSDS/600"
     
 filelist = Get_MSDS_dir(rootdir)
 nbins = 15
-t1 = 400
-tm = 600
+t1 = 800
+tm = 1200
 t2 =  1500
 
 
@@ -49,5 +49,10 @@ for variance_r in flattened:
         #plt.plot(log_time,log_var,"r")
         #plt.plot(np.log10(times_2),slope*np.log10(times_2)+c,"k--")
         alphas.append(slope)
-
-plt.plot(r,alphas,"r")
+        
+fig, ax = plt.subplots()
+plt.xlabel("$r/R(t)$")
+plt.ylabel("$\\alpha(r)$")
+ax.plot(r, alphas, 'r', label='t_r = 400')
+plt.grid()
+legend = ax.legend(loc='upper left', shadow=True, fontsize='x-large')

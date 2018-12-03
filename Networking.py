@@ -173,6 +173,12 @@ for bid in dic_pos.keys():
         a = 0
 plt.hist(np.log10(hist),bins = 100)
 '''
+fname = "/Users/Medina/cellmodeller/data/Practice_Script_Blank-18-08-21-13-44/step-%05d.pickle"
+t = 1200
+cellstate_2,lineage_2 = loadPickle_lite(fname,t)
+print "creating Tree"
+Oak = Create_Tree(lineage_2)
+Oak.create_all_branches()
 #Branch size histogram fix?
 hist = []
 for t in range(100,1000):
@@ -186,13 +192,13 @@ for t in range(100,1000):
         try:
             branch_cells = [cellstate_2[id] for id in Oak.branch[bid].nodes if cellstate_2.has_key(id)]
             real = float(len(branch_cells))
-            #realvalue = real/len(cellstate_2)
-            #Gamma = realvalue/expected
-            #hist.append(Gamma)
-            hist.append(real)
+            realvalue = real/len(cellstate_2)
+            Gamma = realvalue/expected
+            hist.append(Gamma)
+            #hist.append(real)
         except:
             a = 0
-#plt.hist(hist,bins = 100,log = True)
+plt.hist(hist,bins = 100,log = True)
 
 #NETWORK PLOTS
 '''
