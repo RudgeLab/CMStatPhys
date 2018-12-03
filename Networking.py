@@ -173,13 +173,16 @@ for bid in dic_pos.keys():
         a = 0
 plt.hist(np.log10(hist),bins = 100)
 '''
+'''
 fname = "/Users/Medina/cellmodeller/data/Practice_Script_Blank-18-08-21-13-44/step-%05d.pickle"
 t = 1200
 cellstate_2,lineage_2 = loadPickle_lite(fname,t)
 print "creating Tree"
 Oak = Create_Tree(lineage_2)
 Oak.create_all_branches()
+'''
 #Branch size histogram fix?
+'''
 hist = []
 for t in range(100,1000):
     cellstate_t,lineage_t = loadPickle_lite(fname,t)
@@ -199,7 +202,7 @@ for t in range(100,1000):
         except:
             a = 0
 plt.hist(hist,bins = 100,log = True)
-
+'''
 #NETWORK PLOTS
 '''
 for id,pid in lineage_2.iteritems():
