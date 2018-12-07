@@ -15,8 +15,9 @@ datadir = root+"/data"
 datafolders,datafiles,folders = GetSubDir(datadir)
 print sys.argv[1]
 t1 = int(sys.argv[1])
+t2 = int(sys.argv[2])
 
-t2 = 500
+#t2 = 500
 t_tree = 500
 #t2 = 1700 
 #t_tree = 1700

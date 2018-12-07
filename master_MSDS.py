@@ -6,7 +6,11 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def Get_MSDS_dir(rootdir):
     directory = os.listdir(rootdir)
-    directory = [element for element in directory if element != '.DS_Store' and element != 'packed_entropy_data']
+    d
+    
+    
+    
+    rectory = [element for element in directory if element != '.DS_Store' and element != 'packed_entropy_data']
     return directory
 
 def load_arrays(path):

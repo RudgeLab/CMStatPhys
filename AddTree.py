@@ -8,12 +8,13 @@ from RunAndCompress import GetSubDir
 
 root = "/Users/Medina/cellmodeller"
 #root = "/home/inmedina/cellmodeller"
+#root  = "/media/inmedina/Elements"
 datadir = root+"/data"
        
     
 datafolders,datafiles,folders = GetSubDir(datadir)
 
-t2 = 1700
+t2 = 500
 i = 0
 for simulation in datafiles:
     path_to_write = datafolders[i]
@@ -24,7 +25,6 @@ for simulation in datafiles:
     Willow = NWK.Create_Tree(lineage_f)
     Willow.create_all_branches()
     
-    print "obtaining MSD and writing"    
-    cPickle.dump(Willow,open(path_to_write+"/Tree_"+str(t2)+".pickle","wb"))
+    cPickle.dump(Willow,open(path_to_write+"/Tree_"+str(t2)+".pickle","w"))
     i+=1
     print "-----------------------"
