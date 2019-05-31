@@ -27,7 +27,7 @@ def meansqdr(array,rdist):
 
     
 root = "/Users/Medina/cellmodeller"
-#root = "/media/inmedina/Elements/cellmodeller"
+#root = "/media/elements/IgnacioCellModeller"
 #root = "/home/inmedina/cellmodeller"
 datadir = root+"/data"
 
@@ -38,21 +38,21 @@ datafolders,datafiles,folders = GetSubDir(datadir)
 #t2 = int(sys.argv[2])
 
 #tlist = [100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600]
-t1 = 255
-t2 = 700
+t1 = 500
+t2 = 1500
 t_tree = 500
 
 '''
 #t2 = 1700 
 #t_tree = 1700
-path_to_write = root+"/GammaRad"
+'''
+path_to_write = root+"/MSD_AAS"
 if not os.path.isdir(path_to_write):
     os.makedirs(path_to_write)
-'''
 i = 0
 
 for simulation in datafiles:
-    path_to_write = datafolders[i]
+    path_to_write2 = datafolders[i]
     print 'Loading and running '+ datafolders[i]
     cellstate_0,lin_0 = NWK.loadPickle_lite(simulation,t1)
     bnumber = len(cellstate_0)
@@ -143,14 +143,14 @@ for simulation in datafiles:
             bin_dic[t].append(rtheta[t])
             
     #MSD bins:
-    plt.figure()
+    #plt.figure()
     MSD_master = []
     for time,bin_array in bin_dic.iteritems():
         MSD = meansqd(bin_array)
         MSD_master.append(MSD)
-        plt.plot(np.log10(time),np.log10(MSD),"bo",markersize = 0.2)
+        #plt.plot(np.log10(time),np.log10(MSD),"bo",markersize = 0.2)
     
-    cPickle.dump(MSD_master,open(path_to_write+"/MSD_AAS_"+str(t1)+"-"+str(t2)+".pickle","w"))
+    cPickle.dump(MSD_master,open(path_to_write+"/"+str(folders[i])+"_"+str(t1)+"-"+str(t2)+".pickle","w"))
     i+=1
     print "-----------------------"
 
