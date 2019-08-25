@@ -14,7 +14,7 @@ datadir = root+"/data"
     
 datafolders,datafiles,folders = GetSubDir(datadir)
 
-t2 = 500
+t2 = 1000
 i = 0
 for simulation in datafiles:
     path_to_write = datafolders[i]

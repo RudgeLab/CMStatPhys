@@ -38,8 +38,8 @@ datafolders,datafiles,folders = GetSubDir(datadir)
 #t2 = int(sys.argv[2])
 
 #tlist = [100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600]
-t1 = 500
-t2 = 1500
+t1 = 255
+t2 = 500
 t_tree = 500
 
 '''
@@ -148,7 +148,7 @@ for simulation in datafiles:
     for time,bin_array in bin_dic.iteritems():
         MSD = meansqd(bin_array)
         MSD_master.append(MSD)
-        #plt.plot(np.log10(time),np.log10(MSD),"bo",markersize = 0.2)
+        plt.plot(np.log10(time),np.log10(MSD),"bo",markersize = 0.2)
     
     cPickle.dump(MSD_master,open(path_to_write+"/"+str(folders[i])+"_"+str(t1)+"-"+str(t2)+".pickle","w"))
     i+=1

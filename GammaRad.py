@@ -34,7 +34,7 @@ datafolders,datafiles,folders = GetSubDir(datadir)
 #t2 = int(sys.argv[2])
 
 #tlist = [100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600]
-tlist = [100,200,300]
+tlist = [100,200]
 t2 = 500
 t_tree = 500
 
@@ -61,6 +61,7 @@ for simulation in datafiles:
         
         Gamma_list = []
         R_list = []
+        Nb_list = []
         for id,cell in cellstate.iteritems():
             #R:
             R = get_cell_r(cell)
@@ -71,7 +72,7 @@ for simulation in datafiles:
             N_b = float(len(branch_cells))
             N_norm = N_b/N_T
             Gamma = N_norm / expected
-            
+            Nb_list.append(N_b)
             Gamma_list.append(Gamma)
             Gamma_array = np.array(Gamma_list)
         
@@ -89,6 +90,6 @@ for simulation in datafiles:
         final[0] = sorted_Gamma
         final[1] = sorted_R
         
-        np.savetxt(path_to_write+"/GammaRad-"+str(t)+"-"+str(t2)+"-"+str(t_tree)+'.gz',final)
+        #np.savetxt(path_to_write+"/GammaRad-"+str(t)+"-"+str(t2)+"-"+str(t_tree)+"-"+str(i)+'.gz',final)
     i+=1
     print "-----------------------"

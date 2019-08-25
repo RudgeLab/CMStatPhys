@@ -6,16 +6,28 @@ def load_arrays(path):
     array = np.loadtxt(path)
     return array
 
-t1list = [800,1000,1200,1400]
-t1 = 1000
-t2 = 1700
+t1list = [1300]
+#t1 = 1000
+#t2 = t1+200
 ttree = 1700
 root = "/Users/Medina/cellmodeller/histograms_1700"
-
+fig, ax = plt.subplots()
 for t1 in t1list:
+    t2 = 1700
+    fig, ax = plt.subplots()
+
     Gammapth = root + "/Gamma/Gamma-"+str(t1)+"-"+str(t2)+"-"+str(ttree)
     Gamma = load_arrays(Gammapth)
-    plt.hist(np.log10(Gamma),log = True, bins = 15,alpha=0.5)
+    
+    plt.xlabel("$log_{10}(\Gamma)$")
+    plt.ylabel("$log_{10}(freq)$")
+    weights = np.ones_like(np.log10(Gamma))/len(np.log10(Gamma))
+    ax.hist(np.log10(Gamma), edgecolor = "black",weights=weights,log = True,bins = 10, alpha = 0.5, label='$t_0,t ='+str(t1)+","+str(t2)+'$')
+
+    plt.grid()
+    legend = ax.legend(loc='upper right', fontsize=8)
+
+    #plt.hist(np.log10(Gamma), log = True, bins = 10,alpha=0.5)
 
 '''
 masterNb = []

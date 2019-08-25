@@ -22,7 +22,7 @@ def mean_sq_d(array2d):
 fname = "/Users/Medina/cellmodeller/data/Practice_Script_Blank-18-08-21-13-44/step-%05d.pickle"
 t1 = 255
 t2 = 1000
-'''
+
 cellstate_0,lin_0 = NWK.loadPickle_lite(fname,t1)
 bnumber = len(cellstate_0)
 Oak.set_t0_branches(cellstate_0,t1)
@@ -53,7 +53,7 @@ for t in range(t1,t2):
         variances[i,t-t1] = var_t
         ncells[i,t-t1] = ncell
         i +=1
-'''
+
 
 
 print "plotting"
@@ -81,8 +81,7 @@ for bid in range(0,bnumber-1):
 plt.plot(log_time,log_time,"k")
 '''
 
-#this
-'''
+
 for bid in range(0,bnumber-1):
     color = (np.random.rand(1)[0],np.random.rand(1)[0],np.random.rand(1)[0])
     
@@ -102,7 +101,7 @@ for bid in range(0,bnumber-1):
         plt.plot(np.log10(times_2),slope*np.log10(times_2)+c,color=color)
         
     plt.plot(log_time,log_var,color = color,linewidth = 1)
-'''    
+
 #plt.plot(log_time,log_time,"k")
 
 #SLOPE OF LOG SPACE  = ALPHA 
